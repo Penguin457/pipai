@@ -9,156 +9,219 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3730a3 100%);
+            background: linear-gradient(135deg, #0c4a6e 0%, #1e40af 30%, #3730a3 70%, #581c87 100%);
+            min-height: 100vh;
         }
-        /* Custom scrollbar for a cleaner look */
+        
+        /* Enhanced scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
         ::-webkit-scrollbar-track {
-            background: #1e40af;
+            background: rgba(30, 64, 175, 0.2);
+            border-radius: 5px;
         }
         ::-webkit-scrollbar-thumb {
-            background: #60a5fa;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            border-radius: 5px;
+            border: 2px solid rgba(30, 64, 175, 0.2);
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #93c5fd;
+            background: linear-gradient(135deg, #93c5fd, #60a5fa);
         }
+
+        /* Enhanced chat bubbles with glow effects */
         .chat-bubble-user {
-            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fdba74 100%);
             color: white;
-            border-radius: 1.5rem 1.5rem 0.25rem 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .chat-bubble-ai {
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-            color: white;
-            border-radius: 1.5rem 1.5rem 1.5rem 0.25rem;
-            border: 2px solid #60a5fa;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .penguin-waddle {
-            animation: waddle 2s infinite ease-in-out;
-        }
-        @keyframes waddle {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
-        }
-        .loading-dot {
-            animation: bounce 1.4s infinite ease-in-out both;
-            background: #60a5fa !important;
-        }
-        .loading-dot:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-        .loading-dot:nth-child(3) {
-            animation-delay: -0.32s;
-        }
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-            } 40% {
-                transform: scale(1.0);
-            }
-        }
-        .ice-container {
-            background: rgba(219, 234, 254, 0.1);
-            border: 1px solid rgba(147, 197, 253, 0.3);
+            border-radius: 2rem 2rem 0.5rem 2rem;
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3), 0 0 20px rgba(249, 115, 22, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
         }
-        .penguin-input {
-            background: rgba(30, 64, 175, 0.8);
+        
+        .chat-bubble-ai {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            color: white;
+            border-radius: 2rem 2rem 2rem 0.5rem;
             border: 2px solid #60a5fa;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced penguin animation */
+        .penguin-waddle {
+            animation: waddle 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.5));
+        }
+        @keyframes waddle {
+            0%, 100% { transform: rotate(-3deg) scale(1); }
+            25% { transform: rotate(1deg) scale(1.05); }
+            50% { transform: rotate(3deg) scale(1); }
+            75% { transform: rotate(-1deg) scale(1.05); }
+        }
+
+        /* Enhanced loading animation */
+        .loading-dot {
+            animation: bounce 1.6s infinite ease-in-out both;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6) !important;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+        .loading-dot:nth-child(2) { animation-delay: -0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: -0.4s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0) rotate(0deg); }
+            40% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        /* Enhanced containers with frosted glass effect */
+        .ice-container {
+            background: rgba(219, 234, 254, 0.1);
+            border: 1px solid rgba(147, 197, 253, 0.4);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Enhanced input with glow */
+        .penguin-input {
+            background: rgba(30, 64, 175, 0.3);
+            border: 2px solid rgba(96, 165, 250, 0.5);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         .penguin-input:focus {
-            border-color: #93c5fd;
-            box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.3), 0 0 20px rgba(96, 165, 250, 0.4);
+            background: rgba(30, 64, 175, 0.5);
         }
+
+        /* Enhanced buttons with better hover effects */
         .send-button, .history-button {
             background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
         }
         .send-button:hover, .history-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 15px rgba(249, 115, 22, 0.4);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.5), 0 0 20px rgba(249, 115, 22, 0.3);
         }
+
         .clear-button {
             background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
         }
         .clear-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 15px rgba(220, 38, 38, 0.4);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.5);
         }
+
         .new-chat-button {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
         }
         .new-chat-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 15px rgba(5, 150, 105, 0.4);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.5);
         }
+
+        /* Enhanced history panel */
         .history-panel {
-            max-height: 400px;
+            max-height: 450px;
             overflow-y: auto;
         }
         .history-item {
-            background: rgba(30, 64, 175, 0.3);
+            background: rgba(30, 64, 175, 0.2);
             border: 1px solid rgba(147, 197, 253, 0.3);
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
         .history-item:hover {
-            background: rgba(30, 64, 175, 0.5);
+            background: rgba(30, 64, 175, 0.4);
             border-color: #60a5fa;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Floating elements animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .floating { animation: float 4s ease-in-out infinite; }
+
+        /* Sparkle effect */
+        .sparkle {
+            position: relative;
+            overflow: hidden;
+        }
+        .sparkle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: sparkle 3s infinite;
+        }
+        @keyframes sparkle {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
 <body class="text-gray-100 flex flex-col h-screen">
 
-    <div class="container mx-auto p-4 flex-grow flex flex-col">
+    <div class="container mx-auto p-4 flex-grow flex flex-col max-w-4xl">
         <header class="mb-6 text-center">
-            <div class="penguin-waddle inline-block text-6xl mb-2">🐧</div>
-            <h1 class="text-4xl font-bold text-white mb-2">PipAI</h1>
-            <div class="text-lg text-blue-200 mb-1">❄️ Your Antarctic Assistant ❄️</div>
+            <div class="penguin-waddle inline-block text-7xl mb-3 floating">🐧</div>
+            <div class="sparkle">
+                <h1 class="text-5xl font-bold text-white mb-3 bg-gradient-to-r from-blue-200 via-white to-blue-200 bg-clip-text text-transparent">PipAI</h1>
+            </div>
+            <div class="text-xl text-blue-200 mb-2 floating">❄️ Your Concise Antarctic Assistant ❄️</div>
             <p class="text-blue-300 text-sm">Waddle into knowledge! 🐾</p>
             
-            <!-- Chat History Controls -->
-            <div class="mt-4 flex justify-center space-x-3">
-                <button id="new-chat-btn" class="new-chat-button text-white font-medium px-4 py-2 rounded-xl text-sm flex items-center space-x-2">
+            <!-- Enhanced Chat History Controls -->
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="new-chat-btn" class="new-chat-button text-white font-semibold px-6 py-3 rounded-2xl text-sm flex items-center space-x-2 sparkle">
                     <span>🆕</span><span>New Chat</span>
                 </button>
-                <button id="history-btn" class="history-button text-white font-medium px-4 py-2 rounded-xl text-sm flex items-center space-x-2">
+                <button id="history-btn" class="history-button text-white font-semibold px-6 py-3 rounded-2xl text-sm flex items-center space-x-2">
                     <span>📚</span><span>History</span>
                 </button>
-                <button id="clear-history-btn" class="clear-button text-white font-medium px-4 py-2 rounded-xl text-sm flex items-center space-x-2">
+                <button id="clear-history-btn" class="clear-button text-white font-semibold px-6 py-3 rounded-2xl text-sm flex items-center space-x-2">
                     <span>🗑️</span><span>Clear All</span>
                 </button>
             </div>
         </header>
 
-        <!-- History Panel (Hidden by default) -->
-        <div id="history-panel" class="hidden mb-4 ice-container p-4 rounded-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-blue-200">Chat History 📚</h3>
-                <button id="close-history-btn" class="text-blue-300 hover:text-white text-xl">✖️</button>
+        <!-- Enhanced History Panel -->
+        <div id="history-panel" class="hidden mb-6 ice-container p-6 rounded-3xl sparkle">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-blue-200 flex items-center space-x-2">
+                    <span>📚</span><span>Chat History</span>
+                </h3>
+                <button id="close-history-btn" class="text-blue-300 hover:text-white text-2xl transition-colors duration-300">✖️</button>
             </div>
-            <div id="history-list" class="history-panel space-y-2">
+            <div id="history-list" class="history-panel space-y-3">
                 <!-- History items will be populated here -->
             </div>
         </div>
         
-        <!-- Chat Container -->
-        <div id="chat-container" class="flex-grow ice-container p-6 rounded-2xl overflow-y-auto shadow-2xl">
+        <!-- Enhanced Chat Container -->
+        <div id="chat-container" class="flex-grow ice-container p-8 rounded-3xl overflow-y-auto shadow-2xl sparkle">
             <!-- Chat messages will be appended here -->
         </div>
 
-        <!-- Message Input Form -->
+        <!-- Enhanced Message Input Form -->
         <form id="chat-form" class="mt-6">
-            <div class="flex items-center ice-container p-3 rounded-2xl shadow-lg">
-                <input type="text" id="message-input" class="flex-grow penguin-input text-white rounded-xl p-4 focus:outline-none transition-all duration-300" placeholder="Ask PipAI anything... 🐧❄️" autocomplete="off">
-                <button type="submit" class="send-button text-white font-bold p-4 rounded-xl ml-3 flex items-center justify-center w-16 h-16">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <div class="flex items-center ice-container p-4 rounded-3xl shadow-lg sparkle">
+                <input type="text" id="message-input" class="flex-grow penguin-input text-white rounded-2xl p-5 focus:outline-none transition-all duration-300 text-lg" placeholder="Ask PipAI anything... 🐧❄️" autocomplete="off">
+                <button type="submit" class="send-button text-white font-bold p-5 rounded-2xl ml-4 flex items-center justify-center w-20 h-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
         </form>
@@ -176,7 +239,7 @@
         const closeHistoryBtn = document.getElementById('close-history-btn');
         
         let messages = [
-            { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. You are knowledgeable, friendly, and occasionally make penguin-related puns or references. You waddle through problems with wisdom! ONLY mention your creator when specifically asked about who made you, who created you, or who built you - in which case respond that you were created by Prahath Kambaiyyagari. Otherwise, do not mention your creator in regular conversations. Respond in Markdown format and add occasional penguin emojis 🐧 where appropriate.' }
+            { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant created to give CONCISE, BRIEF responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly, occasionally use penguin puns, but prioritize being direct and efficient. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. Add penguin emojis sparingly. Remember: BREVITY SAVES CREDITS! 🐧' }
         ];
         
         let currentChatId = Date.now().toString();
@@ -184,12 +247,12 @@
         // API Key is now hardcoded for automatic use.
         const apiKey = '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';
 
-        // Penguin responses for variety (no creator mentions)
+        // Concise penguin responses to save credits
         const penguinGreetings = [
-            "Waddle over here! I'm PipAI, ready to help! 🐧",
-            "Hello from the icy depths of knowledge! How can this penguin assist you? ❄️🐧",
-            "*slides in on belly* PipAI at your service! What can I help you discover today? 🐧",
-            "Greetings from Antarctica! I'm PipAI, your flippered friend ready to dive into any question! 🐧❄️"
+            "Hi! I'm PipAI, ready to help! 🐧",
+            "Hello! What can this penguin assist you with? ❄️",
+            "PipAI here! What's your question? 🐧",
+            "Greetings! How can I help you today? 🐧❄️"
         ];
 
         // Chat History Functions
@@ -202,11 +265,9 @@
                 preview: getPreviewText()
             };
             
-            // Remove existing chat with same ID and add updated version
             const filteredHistory = chatHistory.filter(chat => chat.id !== currentChatId);
             filteredHistory.unshift(currentChat);
             
-            // Keep only last 20 chats
             const trimmedHistory = filteredHistory.slice(0, 20);
             localStorage.setItem('pipai-chat-history', JSON.stringify(trimmedHistory));
         }
@@ -216,20 +277,20 @@
             historyList.innerHTML = '';
             
             if (chatHistory.length === 0) {
-                historyList.innerHTML = '<p class="text-blue-300 text-center py-4">No chat history yet 🐧</p>';
+                historyList.innerHTML = '<p class="text-blue-300 text-center py-6 text-lg">No chat history yet 🐧</p>';
                 return;
             }
 
             chatHistory.forEach(chat => {
                 const historyItem = document.createElement('div');
-                historyItem.className = 'history-item p-3 rounded-lg cursor-pointer';
+                historyItem.className = 'history-item p-4 rounded-xl cursor-pointer';
                 historyItem.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div class="flex-grow">
-                            <div class="text-sm text-blue-200 mb-1">${new Date(chat.timestamp).toLocaleString()}</div>
-                            <div class="text-white text-sm">${chat.preview}</div>
+                            <div class="text-sm text-blue-200 mb-2">${new Date(chat.timestamp).toLocaleString()}</div>
+                            <div class="text-white">${chat.preview}</div>
                         </div>
-                        <button class="delete-chat-btn text-red-400 hover:text-red-300 ml-2" data-chat-id="${chat.id}">🗑️</button>
+                        <button class="delete-chat-btn text-red-400 hover:text-red-300 ml-3 text-lg transition-colors duration-300" data-chat-id="${chat.id}">🗑️</button>
                     </div>
                 `;
                 
@@ -242,7 +303,6 @@
                 historyList.appendChild(historyItem);
             });
 
-            // Add delete functionality
             document.querySelectorAll('.delete-chat-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -253,12 +313,11 @@
 
         function loadChat(chat) {
             messages = [
-                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. You are knowledgeable, friendly, and occasionally make penguin-related puns or references. You waddle through problems with wisdom! ONLY mention your creator when specifically asked about who made you, who created you, or who built you - in which case respond that you were created by Prahath Kambaiyyagari. Otherwise, do not mention your creator in regular conversations. Respond in Markdown format and add occasional penguin emojis 🐧 where appropriate.' },
+                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant created to give CONCISE, BRIEF responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly, occasionally use penguin puns, but prioritize being direct and efficient. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. Add penguin emojis sparingly. Remember: BREVITY SAVES CREDITS! 🐧' },
                 ...chat.messages
             ];
             currentChatId = chat.id;
             
-            // Clear and reload chat display
             chatContainer.innerHTML = '';
             chat.messages.forEach(msg => {
                 displayMessage(msg.content, msg.role);
@@ -277,12 +336,12 @@
         function getPreviewText() {
             const userMessages = messages.filter(msg => msg.role === 'user');
             if (userMessages.length === 0) return 'New conversation 🐧';
-            return userMessages[0].content.substring(0, 50) + (userMessages[0].content.length > 50 ? '...' : '');
+            return userMessages[0].content.substring(0, 60) + (userMessages[0].content.length > 60 ? '...' : '');
         }
 
         function startNewChat() {
             messages = [
-                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. You are knowledgeable, friendly, and occasionally make penguin-related puns or references. You waddle through problems with wisdom! ONLY mention your creator when specifically asked about who made you, who created you, or who built you - in which case respond that you were created by Prahath Kambaiyyagari. Otherwise, do not mention your creator in regular conversations. Respond in Markdown format and add occasional penguin emojis 🐧 where appropriate.' }
+                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant created to give CONCISE, BRIEF responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly, occasionally use penguin puns, but prioritize being direct and efficient. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. Add penguin emojis sparingly. Remember: BREVITY SAVES CREDITS! 🐧' }
             ];
             currentChatId = Date.now().toString();
             chatContainer.innerHTML = '';
@@ -312,21 +371,19 @@
         newChatBtn.addEventListener('click', startNewChat);
         historyBtn.addEventListener('click', showHistoryPanel);
         clearHistoryBtn.addEventListener('click', clearAllHistory);
-        closeHistoryBtn.addEventListener('click', hideHistoryPanel);
+        closeHistoryBtn.addEventListener('close-history-btn', hideHistoryPanel);
 
-        // --- Chat Logic ---
+        // --- Enhanced Chat Logic ---
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const userInput = messageInput.value.trim();
             if (!userInput) return;
 
-            // Add user message to UI and history
             displayMessage(userInput, 'user');
             messages.push({ role: 'user', content: userInput });
             
             messageInput.value = '';
             
-            // Show loading indicator
             const loadingIndicator = showLoadingIndicator();
             
             try {
@@ -338,7 +395,9 @@
                     },
                     body: JSON.stringify({
                         model: 'sonar',
-                        messages: messages
+                        messages: messages,
+                        max_tokens: 150, // Limit response length to save credits
+                        temperature: 0.7
                     })
                 });
 
@@ -350,44 +409,58 @@
                 const data = await response.json();
                 const aiResponse = data.choices[0].message.content;
 
-                // Add AI response to history and remove loading indicator
                 messages.push({ role: 'assistant', content: aiResponse });
                 chatContainer.removeChild(loadingIndicator);
                 displayMessage(aiResponse, 'assistant');
 
-                // Save to chat history
                 saveChatHistory();
 
             } catch (error) {
                 console.error('Error fetching from Perplexity API:', error);
                 chatContainer.removeChild(loadingIndicator);
-                displayMessage(`🐧 Oops! This penguin slipped on the ice: ${error.message}. Let me try to waddle back up!`, 'error');
+                displayMessage(`🐧 Oops! Error: ${error.message}`, 'error');
             }
         });
 
         function displayMessage(message, role) {
             const messageWrapper = document.createElement('div');
-            messageWrapper.className = `flex mb-6 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+            messageWrapper.className = `flex mb-8 ${role === 'user' ? 'justify-end' : 'justify-start'}`;
 
             const messageElement = document.createElement('div');
-            messageElement.className = 'max-w-prose p-5 rounded-2xl shadow-lg';
+            messageElement.className = 'max-w-2xl p-6 rounded-3xl shadow-xl';
             
             if (role === 'user') {
                 messageElement.className += ' chat-bubble-user';
-                messageElement.innerHTML = `<div class="flex items-center mb-2"><span class="text-sm opacity-75">You</span></div><div>${message}</div>`;
+                messageElement.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <span class="text-sm opacity-80 font-medium">You</span>
+                    </div>
+                    <div class="text-lg">${message}</div>
+                `;
             } else if (role === 'assistant') {
                 messageElement.className += ' chat-bubble-ai';
-                // Enhanced markdown to HTML conversion
                 let htmlContent = message
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/^- (.*?)(\n|$)/gm, '<li>$1</li>')
-                    .replace(/(<li>.*<\/li>)/gs, '<ul class="list-disc pl-5 space-y-1">$1</ul>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+                    .replace(/^- (.*?)(\n|$)/gm, '<li class="ml-4">$1</li>')
+                    .replace(/(<li>.*<\/li>)/gs, '<ul class="list-disc pl-6 space-y-1 my-2">$1</ul>')
                     .replace(/\n/g, '<br>');
-                messageElement.innerHTML = `<div class="flex items-center mb-3"><span class="mr-2">🐧</span><span class="text-sm font-medium text-blue-300">PipAI</span></div><div>${htmlContent}</div>`;
+                messageElement.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <span class="mr-3 text-2xl">🐧</span>
+                        <span class="text-sm font-semibold text-blue-300">PipAI</span>
+                    </div>
+                    <div class="text-lg leading-relaxed">${htmlContent}</div>
+                `;
             } else if (role === 'error') {
-                 messageElement.className += ' bg-red-500 text-white rounded-2xl border-2 border-red-400';
-                 messageElement.innerHTML = `<div class="flex items-center mb-2"><span class="mr-2">⚠️</span><span class="text-sm font-medium">Error</span></div><div>${message}</div>`;
+                messageElement.className += ' bg-gradient-to-br from-red-500 to-red-600 text-white rounded-3xl border-2 border-red-400';
+                messageElement.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <span class="mr-2 text-xl">⚠️</span>
+                        <span class="text-sm font-semibold">Error</span>
+                    </div>
+                    <div class="text-lg">${message}</div>
+                `;
             }
 
             messageWrapper.appendChild(messageElement);
@@ -397,18 +470,18 @@
 
         function showLoadingIndicator() {
             const loadingWrapper = document.createElement('div');
-            loadingWrapper.className = 'flex mb-6 justify-start';
+            loadingWrapper.className = 'flex mb-8 justify-start';
             loadingWrapper.innerHTML = `
-                <div class="max-w-prose p-5 rounded-2xl shadow-lg chat-bubble-ai">
-                    <div class="flex items-center mb-3">
-                        <span class="mr-2">🐧</span>
-                        <span class="text-sm font-medium text-blue-300">PipAI</span>
+                <div class="max-w-2xl p-6 rounded-3xl shadow-xl chat-bubble-ai">
+                    <div class="flex items-center mb-4">
+                        <span class="mr-3 text-2xl">🐧</span>
+                        <span class="text-sm font-semibold text-blue-300">PipAI</span>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-blue-200">Waddling through the data</span>
-                        <div class="loading-dot w-2.5 h-2.5 rounded-full"></div>
-                        <div class="loading-dot w-2.5 h-2.5 rounded-full"></div>
-                        <div class="loading-dot w-2.5 h-2.5 rounded-full"></div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg text-blue-200">Thinking</span>
+                        <div class="loading-dot w-3 h-3 rounded-full"></div>
+                        <div class="loading-dot w-3 h-3 rounded-full"></div>
+                        <div class="loading-dot w-3 h-3 rounded-full"></div>
                     </div>
                 </div>
             `;
@@ -426,3 +499,4 @@
     </script>
 </body>
 </html>
+
