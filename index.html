@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PipAI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
+        
         body {
             background: #f7f7f8;
         }
+        
         .dark-mode {
             background: #212121;
         }
+        
+        /* Custom scrollbar - minimal like ChatGPT */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -29,6 +33,8 @@
         .dark-mode ::-webkit-scrollbar-thumb {
             background: #4b5563;
         }
+        
+        /* Clean chat bubbles */
         .user-message {
             background: #f4f4f4;
             color: #374151;
@@ -37,17 +43,21 @@
             background: #2d2d30;
             color: #e5e7eb;
         }
+        
         .ai-message {
             background: transparent;
             border-left: 3px solid #10b981;
             padding-left: 16px;
         }
+        
+        /* Image gallery styles */
         .image-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 8px;
             margin: 12px 0;
         }
+        
         .image-item {
             position: relative;
             overflow: hidden;
@@ -56,14 +66,17 @@
             cursor: pointer;
             transition: transform 0.2s ease;
         }
+        
         .image-item:hover {
             transform: scale(1.05);
         }
+        
         .image-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        
         .image-overlay {
             position: absolute;
             bottom: 0;
@@ -74,21 +87,27 @@
             padding: 8px;
             font-size: 0.75rem;
         }
+        
+        /* Modal styles */
         .modal {
             position: fixed;
-            top:0; left:0;
-            width:100%; height:100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.9);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            z-index:1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
+        
         .modal img {
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
         }
+        
         .modal-close {
             position: absolute;
             top: 20px;
@@ -97,6 +116,8 @@
             font-size: 2rem;
             cursor: pointer;
         }
+        
+        /* Minimal button styles */
         .btn-primary {
             background: #10b981;
             color: white;
@@ -109,6 +130,7 @@
             background: #d1d5db;
             cursor: not-allowed;
         }
+        
         .btn-secondary {
             background: transparent;
             border: 1px solid #d1d5db;
@@ -127,6 +149,8 @@
             background: #374151;
             border-color: #6b7280;
         }
+        
+        /* Input styling like modern AI chats */
         .chat-input {
             background: white;
             border: 1px solid #e5e7eb;
@@ -145,6 +169,8 @@
         .dark-mode .chat-input:focus {
             border-color: #10b981;
         }
+        
+        /* Rate limit warning styles */
         .rate-limit-warning {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -155,6 +181,8 @@
             border-color: #92400e;
             color: #fbbf24;
         }
+        
+        /* Loading animation - minimal dots */
         .typing-indicator {
             display: inline-flex;
             align-items: center;
@@ -169,10 +197,13 @@
         }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
         @keyframes typing {
             0%, 80%, 100% { opacity: 0.3; }
             40% { opacity: 1; }
         }
+        
+        /* Sidebar like ChatGPT */
         .sidebar {
             background: white;
             border-right: 1px solid #e5e7eb;
@@ -182,6 +213,7 @@
             background: #171717;
             border-color: #2d2d30;
         }
+        
         .history-item {
             transition: all 0.2s ease;
         }
@@ -191,12 +223,16 @@
         .dark-mode .history-item:hover {
             background: #2d2d30;
         }
+        
+        /* Main chat area */
         .chat-container {
             background: white;
         }
         .dark-mode .chat-container {
             background: #212121;
         }
+        
+        /* Header minimal style */
         .header-minimal {
             border-bottom: 1px solid #e5e7eb;
             background: rgba(255,255,255,0.8);
@@ -206,6 +242,8 @@
             border-color: #2d2d30;
             background: rgba(33,33,33,0.8);
         }
+        
+        /* Mobile responsiveness */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -224,673 +262,619 @@
 </head>
 <body class="h-screen flex overflow-hidden">
     
-<div id="sidebar" class="sidebar w-80 flex-shrink-0 flex flex-col">
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-        <button id="new-chat-btn" class="btn-primary w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 5v14M5 12h14"/>
-            </svg>
-            New chat
-        </button>
-    </div>
-
-    <div class="flex-1 overflow-y-auto p-2">
-        <div id="history-list" class="space-y-1">
-        </div>
-    </div>
-
-    <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-        <div id="rate-limit-status" class="text-xs text-gray-500 text-center py-2">
-            Questions: <span id="question-count">0</span>/6 per minute
-        </div>
-        <button id="clear-history-btn" class="btn-secondary w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-            Clear conversations
-        </button>
-        <button id="theme-toggle" class="btn-secondary w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="4"/><path d="M12 1v6m0 6v6"/>
-            </svg>
-            Dark mode
-        </button>
-    </div>
-</div>
-
-<div class="flex-1 flex flex-col chat-container">
-    <div class="header-minimal p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <button id="sidebar-toggle" class="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12h18M3 6h18M3 18h18"/>
+    <!-- Sidebar - ChatGPT style -->
+    <div id="sidebar" class="sidebar w-80 flex-shrink-0 flex flex-col">
+        <!-- Sidebar Header -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <button id="new-chat-btn" class="btn-primary w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
                 </svg>
+                New chat
             </button>
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">🐧</span>
-                <span class="font-semibold text-gray-900 dark:text-white">PipAI</span>
+        </div>
+        
+        <!-- Chat History -->
+        <div class="flex-1 overflow-y-auto p-2">
+            <div id="history-list" class="space-y-1">
+                <!-- History items will be populated here -->
             </div>
         </div>
-        <div class="text-sm text-gray-500">
-            Made by Prahath
+        
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+            <!-- Rate Limit Status -->
+            <div id="rate-limit-status" class="text-xs text-gray-500 text-center py-2">
+                Questions: <span id="question-count">0</span>/6 per minute
+            </div>
+            <button id="clear-history-btn" class="btn-secondary w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Clear conversations
+            </button>
+            <button id="theme-toggle" class="btn-secondary w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="4"/><path d="M12 1v6m0 6v6"/>
+                </svg>
+                Dark mode
+            </button>
         </div>
     </div>
-    <div id="rate-limit-warning" class="hidden rate-limit-warning mx-4 mt-2 p-3 rounded-lg text-sm">
-        <div class="flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-            </svg>
-            <span>You've reached the 6 questions per minute limit. Please wait <span id="cooldown-time">60</span> seconds before asking again. 🐧</span>
-        </div>
-    </div>
-    <div id="chat-container" class="flex-1 overflow-y-auto">
-        <div class="max-w-3xl mx-auto px-4 py-6"></div>
-    </div>
-    <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div class="max-w-3xl mx-auto">
-            <form id="chat-form">
-                <div class="relative">
-                    <input type="text" id="message-input" class="chat-input w-full py-4 px-4 pr-12 rounded-xl resize-none focus:outline-none" placeholder="Message PipAI... (Try: 'show me images of penguins' or 'show me a funny penguin gif')" autocomplete="off" />
-                    <button type="submit" id="send-button" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
-                        </svg>
-                    </button>
+    
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col chat-container">
+        <!-- Header -->
+        <div class="header-minimal p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="sidebar-toggle" class="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🐧</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">PipAI</span>
                 </div>
-            </form>
+            </div>
+            <div class="text-sm text-gray-500">
+                Powered by Sonar + Pexels
+            </div>
+        </div>
+        
+        <!-- Rate Limit Warning (Hidden by default) -->
+        <div id="rate-limit-warning" class="hidden rate-limit-warning mx-4 mt-2 p-3 rounded-lg text-sm">
+            <div class="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+                <span>You've reached the 6 questions per minute limit. Please wait <span id="cooldown-time">60</span> seconds before asking again. 🐧</span>
+            </div>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div id="chat-container" class="flex-1 overflow-y-auto">
+            <div class="max-w-3xl mx-auto px-4 py-6">
+                <!-- Messages will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="max-w-3xl mx-auto">
+                <form id="chat-form">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="message-input" 
+                            class="chat-input w-full py-4 px-4 pr-12 rounded-xl resize-none focus:outline-none"
+                            placeholder="Message PipAI... (Try: 'show me images of penguins')"
+                            autocomplete="off"
+                        >
+                        <button 
+                            type="submit" 
+                            id="send-button"
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="image-modal" class="modal hidden" onclick="closeImageModal()">
-    <span class="modal-close">&times;</span>
-    <img id="modal-image" src="" alt="" />
-</div>
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal hidden" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img id="modal-image" src="" alt="">
+    </div>
 
-<script>
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const chatContainer = document.getElementById('chat-container');
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const historyList = document.getElementById('history-list');
-    const newChatBtn = document.getElementById('new-chat-btn');
-    const clearHistoryBtn = document.getElementById('clear-history-btn');
-    const themeToggle = document.getElementById('theme-toggle');
-    const rateLimitWarning = document.getElementById('rate-limit-warning');
-    const questionCount = document.getElementById('question-count');
-    const cooldownTime = document.getElementById('cooldown-time');
-    const imageModal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
+    <script>
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const historyList = document.getElementById('history-list');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const rateLimitWarning = document.getElementById('rate-limit-warning');
+        const questionCount = document.getElementById('question-count');
+        const cooldownTime = document.getElementById('cooldown-time');
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        
+        let messages = [
+            { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, or visual content, respond that you can show them relevant images and then use the searchImages function. Remember: BREVITY SAVES CREDITS! 🐧' }
+        ];
+        
+        let currentChatId = Date.now().toString();
+        let isLoading = false;
+        
+        // Rate limiting variables
+        let questionTimestamps = [];
+        const MAX_QUESTIONS_PER_MINUTE = 6;
+        const RATE_LIMIT_WINDOW = 60 * 1000; // 60 seconds in milliseconds
+        let cooldownTimer = null;
+        
+        // API Keys
+        const perplexityApiKey = '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';
+        const pexelsApiKey = 'vDuHqfCFC7CPcWiEgpkpyvHeBLRbcrfYkjHRbT39gVO7tsjTGjtiEn61';
 
-    let messages = [
-        {
-            role: 'system',
-            content:
-                "You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, gifs, or visual content, respond that you can show them relevant images and gifs and then use the searchImages or searchGifs functions. Remember: BREVITY SAVES CREDITS! 🐧",
-        },
-    ];
+        // Image search functionality
+        async function searchImages(query, count = 6) {
+            try {
+                const response = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=square`, {
+                    headers: {
+                        'Authorization': pexelsApiKey
+                    }
+                });
 
-    let currentChatId = Date.now().toString();
-    let isLoading = false;
-
-    // Rate limiting
-    let questionTimestamps = [];
-    const MAX_QUESTIONS_PER_MINUTE = 6;
-    const RATE_LIMIT_WINDOW = 60 * 1000;
-    let cooldownTimer = null;
-
-    // API keys
-    const perplexityApiKey = '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';
-    const pexelsApiKey = 'vDuHqfCFC7CPcWiEgpkpyvHeBLRbcrfYkjHRbT39gVO7tsjTGjtiEn61';
-    const giphyApiKey = 'kWzkOt20JaBn4KvElnzzgSLhNal2Nn7i';
-
-    async function searchImages(query, count = 6) {
-        try {
-            const response = await fetch(
-                `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=square`,
-                {
-                    headers: { Authorization: pexelsApiKey },
+                if (!response.ok) {
+                    throw new Error(`Pexels API error: ${response.status}`);
                 }
-            );
-            if (!response.ok) throw new Error(`Pexels API error: ${response.status}`);
-            const data = await response.json();
-            return data.photos || [];
-        } catch (e) {
-            console.error('Error searching images:', e);
-            return [];
-        }
-    }
 
-    async function searchGifs(query, limit = 6) {
-        const url = `https://api.giphy.com/v1/gifs/search?api_key=${giphyApiKey}&q=${encodeURIComponent(
-            query
-        )}&limit=${limit}&rating=pg`;
-        try {
-            const result = await fetch(url);
-            if (!result.ok) throw new Error(`Giphy API error: ${result.status}`);
-            const data = await result.json();
-            return data.data || [];
-        } catch (e) {
-            console.error('Giphy GIF search error:', e);
-            return [];
+                const data = await response.json();
+                return data.photos || [];
+            } catch (error) {
+                console.error('Error searching images:', error);
+                return [];
+            }
         }
-    }
 
-    function createImageGallery(images, query) {
-        if (!images || images.length === 0) {
-            return `<div class="text-gray-500 text-sm py-4">No images found for "${query}" 🐧</div>`;
-        }
-        const galleryHtml = images
-            .map(
-                (image) => `
+        function createImageGallery(images, query) {
+            if (!images || images.length === 0) {
+                return `<div class="text-gray-500 text-sm py-4">No images found for "${query}" 🐧</div>`;
+            }
+
+            const galleryHtml = images.map(image => `
                 <div class="image-item" onclick="openImageModal('${image.src.large}', '${image.alt || query}')">
-                    <img src="${image.src.medium}" alt="${image.alt || query}" loading="lazy" />
+                    <img src="${image.src.medium}" alt="${image.alt || query}" loading="lazy">
                     <div class="image-overlay">
                         <div class="truncate">${image.alt || query}</div>
                         <div class="text-xs opacity-75">Photo by ${image.photographer}</div>
                     </div>
                 </div>
-            `
-            )
-            .join('');
-        return `
-            <div class="image-gallery">
-                ${galleryHtml}
-            </div>
-            <div class="text-xs text-gray-500 mt-2">
-                Click any image to view larger. Photos from Pexels.com
-            </div>
-        `;
-    }
+            `).join('');
 
-    function createGifGallery(gifs, query) {
-        if (!gifs || gifs.length === 0) {
-            return `<div class="text-gray-500 text-sm py-4">No gifs found for "${query}" 🐧</div>`;
-        }
-        return `
-            <div class="image-gallery">
-                ${gifs
-                    .map(
-                        (gif) => `
-                    <div class="image-item" onclick="openImageModal('${gif.images.original.url}', '${query}')">
-                        <img src="${gif.images.fixed_width.url}" alt="${query}" loading="lazy" />
-                        <div class="image-overlay">
-                            <div class="truncate">${gif.title || query}</div>
-                            <div class="text-xs opacity-75">via Giphy</div>
-                        </div>
-                    </div>
-                `
-                    )
-                    .join('')}
-            </div>
-        `;
-    }
-
-    function openImageModal(imageSrc, altText) {
-        modalImage.src = imageSrc;
-        modalImage.alt = altText;
-        imageModal.classList.remove('hidden');
-    }
-
-    function closeImageModal() {
-        imageModal.classList.add('hidden');
-        modalImage.src = '';
-    }
-
-    function isImageRequest(message) {
-        const imageKeywords = [
-            'image',
-            'images',
-            'picture',
-            'pictures',
-            'photo',
-            'photos',
-            'show me',
-            'find images',
-            'search images',
-            'visual',
-            'pic',
-            'pics',
-        ];
-        const lowerMessage = message.toLowerCase();
-        return imageKeywords.some((keyword) => lowerMessage.includes(keyword));
-    }
-
-    function extractImageQuery(message) {
-        const lowerMessage = message.toLowerCase();
-        let query = lowerMessage
-            .replace(/show me (images|pictures|photos) of/g, '')
-            .replace(/find (images|pictures|photos) of/g, '')
-            .replace(/search for (images|pictures|photos) of/g, '')
-            .replace(/(images|pictures|photos|image|picture|photo) of/g, '')
-            .replace(/show me/g, '')
-            .replace(/find/g, '')
-            .replace(/search/g, '')
-            .trim();
-        return query || 'nature';
-    }
-
-    function isGifRequest(message) {
-        const gifKeywords = ['gif', 'gifs', 'animated image', 'animated picture'];
-        const lowerMessage = message.toLowerCase();
-        return gifKeywords.some((keyword) => lowerMessage.includes(keyword));
-    }
-
-    function extractGifQuery(message) {
-        let query = message.toLowerCase();
-        query = query
-            .replace(/show me( a)? gif of/g, '')
-            .replace(/find( a)? gif of/g, '')
-            .replace(/search for( a)? gif of/g, '')
-            .replace(/(gif|gifs|animated image|animated picture) of/g, '')
-            .replace(/show me/g, '')
-            .replace(/find/g, '')
-            .replace(/search/g, '')
-            .replace(/gif|gifs|animated image|animated picture/g, '')
-            .trim();
-        return query || 'funny penguin';
-    }
-
-    // Rate limiting
-    let questionTimestamps = [];
-    const MAX_QUESTIONS_PER_MINUTE = 6;
-    const RATE_LIMIT_WINDOW = 60 * 1000;
-    let cooldownTimer = null;
-
-    const perplexityApiKey = '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';
-
-    function updateQuestionCount() {
-        const now = Date.now();
-        questionTimestamps = questionTimestamps.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW);
-        questionCount.textContent = questionTimestamps.length;
-
-        const isAtLimit = questionTimestamps.length >= MAX_QUESTIONS_PER_MINUTE;
-        sendButton.disabled = isAtLimit || isLoading;
-        messageInput.disabled = isAtLimit;
-
-        if (isAtLimit) {
-            messageInput.placeholder = 'Rate limit reached. Please wait...';
-            showRateLimitWarning();
-        } else {
-            messageInput.placeholder = "Message PipAI... (Try: 'show me images of penguins' or 'show me a funny penguin gif')";
-            hideRateLimitWarning();
-        }
-    }
-
-    function showRateLimitWarning() {
-        rateLimitWarning.classList.remove('hidden');
-        startCooldownTimer();
-    }
-
-    function hideRateLimitWarning() {
-        rateLimitWarning.classList.add('hidden');
-        if (cooldownTimer) {
-            clearInterval(cooldownTimer);
-            cooldownTimer = null;
-        }
-    }
-
-    function startCooldownTimer() {
-        if (cooldownTimer) clearInterval(cooldownTimer);
-
-        const oldestTimestamp = Math.min(...questionTimestamps);
-        const timeUntilReset = RATE_LIMIT_WINDOW - (Date.now() - oldestTimestamp);
-        let secondsLeft = Math.ceil(timeUntilReset / 1000);
-
-        cooldownTime.textContent = secondsLeft;
-
-        cooldownTimer = setInterval(() => {
-            secondsLeft--;
-            cooldownTime.textContent = secondsLeft;
-
-            if (secondsLeft <= 0) {
-                updateQuestionCount();
-            }
-        }, 1000);
-    }
-
-    function canSendMessage() {
-        const now = Date.now();
-        questionTimestamps = questionTimestamps.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW);
-        return questionTimestamps.length < MAX_QUESTIONS_PER_MINUTE;
-    }
-
-    function recordQuestion() {
-        questionTimestamps.push(Date.now());
-        updateQuestionCount();
-    }
-
-    // Theme management
-    function initTheme() {
-        const savedTheme = localStorage.getItem('pipai-theme');
-        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark-mode');
-            themeToggle.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-                Light mode
+            return `
+                <div class="image-gallery">
+                    ${galleryHtml}
+                </div>
+                <div class="text-xs text-gray-500 mt-2">
+                    Click any image to view larger. Photos from Pexels.com
+                </div>
             `;
         }
-    }
 
-    function toggleTheme() {
-        const isDark = document.documentElement.classList.toggle('dark-mode');
-        localStorage.setItem('pipai-theme', isDark ? 'dark' : 'light');
-        themeToggle.innerHTML = isDark
-            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        function openImageModal(imageSrc, altText) {
+            modalImage.src = imageSrc;
+            modalImage.alt = altText;
+            imageModal.classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            imageModal.classList.add('hidden');
+            modalImage.src = '';
+        }
+
+        // Check if message is asking for images
+        function isImageRequest(message) {
+            const imageKeywords = ['image', 'images', 'picture', 'pictures', 'photo', 'photos', 'show me', 'find images', 'search images', 'visual', 'pic', 'pics'];
+            const lowerMessage = message.toLowerCase();
+            return imageKeywords.some(keyword => lowerMessage.includes(keyword));
+        }
+
+        // Extract search query for images
+        function extractImageQuery(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Remove common phrases to get the core search term
+            let query = lowerMessage
+                .replace(/show me (images|pictures|photos) of/g, '')
+                .replace(/find (images|pictures|photos) of/g, '')
+                .replace(/search for (images|pictures|photos) of/g, '')
+                .replace(/(images|pictures|photos|image|picture|photo) of/g, '')
+                .replace(/show me/g, '')
+                .replace(/find/g, '')
+                .replace(/search/g, '')
+                .trim();
+
+            return query || 'nature';
+        }
+
+        // Rate limiting functions
+        function updateQuestionCount() {
+            const now = Date.now();
+            questionTimestamps = questionTimestamps.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+            questionCount.textContent = questionTimestamps.length;
+            
+            const isAtLimit = questionTimestamps.length >= MAX_QUESTIONS_PER_MINUTE;
+            sendButton.disabled = isAtLimit || isLoading;
+            messageInput.disabled = isAtLimit;
+            
+            if (isAtLimit) {
+                messageInput.placeholder = "Rate limit reached. Please wait...";
+                showRateLimitWarning();
+            } else {
+                messageInput.placeholder = "Message PipAI... (Try: 'show me images of penguins')";
+                hideRateLimitWarning();
+            }
+        }
+
+        function showRateLimitWarning() {
+            rateLimitWarning.classList.remove('hidden');
+            startCooldownTimer();
+        }
+
+        function hideRateLimitWarning() {
+            rateLimitWarning.classList.add('hidden');
+            if (cooldownTimer) {
+                clearInterval(cooldownTimer);
+                cooldownTimer = null;
+            }
+        }
+
+        function startCooldownTimer() {
+            if (cooldownTimer) clearInterval(cooldownTimer);
+            
+            const oldestTimestamp = Math.min(...questionTimestamps);
+            const timeUntilReset = RATE_LIMIT_WINDOW - (Date.now() - oldestTimestamp);
+            let secondsLeft = Math.ceil(timeUntilReset / 1000);
+            
+            cooldownTime.textContent = secondsLeft;
+            
+            cooldownTimer = setInterval(() => {
+                secondsLeft--;
+                cooldownTime.textContent = secondsLeft;
+                
+                if (secondsLeft <= 0) {
+                    updateQuestionCount();
+                }
+            }, 1000);
+        }
+
+        function canSendMessage() {
+            const now = Date.now();
+            questionTimestamps = questionTimestamps.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+            return questionTimestamps.length < MAX_QUESTIONS_PER_MINUTE;
+        }
+
+        function recordQuestion() {
+            questionTimestamps.push(Date.now());
+            updateQuestionCount();
+        }
+
+        // Theme management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('pipai-theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark-mode');
+                themeToggle.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    Light mode
+                `;
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('pipai-theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? 
+                `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
-                Light mode`
-            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                Light mode` :
+                `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="4"/><path d="M12 1v6m0 6v6"/>
                 </svg>
                 Dark mode`;
-    }
-
-    // Chat history and UI
-    function saveChatHistory() {
-        const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
-        const currentChat = {
-            id: currentChatId,
-            timestamp: new Date().toISOString(),
-            messages: messages.filter((msg) => msg.role !== 'system'),
-            preview: getPreviewText(),
-        };
-
-        const filteredHistory = chatHistory.filter((chat) => chat.id !== currentChatId);
-        filteredHistory.unshift(currentChat);
-        const trimmedHistory = filteredHistory.slice(0, 20);
-        localStorage.setItem('pipai-chat-history', JSON.stringify(trimmedHistory));
-        loadChatHistory();
-    }
-
-    function loadChatHistory() {
-        const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
-        historyList.innerHTML = '';
-
-        if (chatHistory.length === 0) {
-            historyList.innerHTML = '<div class="text-gray-500 text-sm p-4 text-center">No conversations yet</div>';
-            return;
         }
 
-        chatHistory.forEach((chat) => {
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item p-3 rounded-lg cursor-pointer flex items-center justify-between group';
-            historyItem.innerHTML = `
-                <div class="flex-1 min-w-0">
-                    <div class="text-sm text-gray-900 dark:text-white truncate">${chat.preview}</div>
-                    <div class="text-xs text-gray-500 mt-1">${new Date(chat.timestamp).toLocaleDateString()}</div>
-                </div>
-                <button class="delete-chat-btn opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded" data-chat-id="${chat.id}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                    </svg>
-                </button>
-            `;
+        // Chat history functions
+        function saveChatHistory() {
+            const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
+            const currentChat = {
+                id: currentChatId,
+                timestamp: new Date().toISOString(),
+                messages: messages.filter(msg => msg.role !== 'system'),
+                preview: getPreviewText()
+            };
+            
+            const filteredHistory = chatHistory.filter(chat => chat.id !== currentChatId);
+            filteredHistory.unshift(currentChat);
+            const trimmedHistory = filteredHistory.slice(0, 20);
+            localStorage.setItem('pipai-chat-history', JSON.stringify(trimmedHistory));
+            loadChatHistory();
+        }
 
-            historyItem.addEventListener('click', (e) => {
-                if (!e.target.closest('.delete-chat-btn')) {
-                    loadChat(chat);
+        function loadChatHistory() {
+            const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
+            historyList.innerHTML = '';
+            
+            if (chatHistory.length === 0) {
+                historyList.innerHTML = '<div class="text-gray-500 text-sm p-4 text-center">No conversations yet</div>';
+                return;
+            }
+
+            chatHistory.forEach(chat => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item p-3 rounded-lg cursor-pointer flex items-center justify-between group';
+                historyItem.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm text-gray-900 dark:text-white truncate">${chat.preview}</div>
+                        <div class="text-xs text-gray-500 mt-1">${new Date(chat.timestamp).toLocaleDateString()}</div>
+                    </div>
+                    <button class="delete-chat-btn opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded" data-chat-id="${chat.id}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                `;
+                
+                historyItem.addEventListener('click', (e) => {
+                    if (!e.target.closest('.delete-chat-btn')) {
+                        loadChat(chat);
+                    }
+                });
+                
+                historyList.appendChild(historyItem);
+            });
+
+            document.querySelectorAll('.delete-chat-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteChat(btn.dataset.chatId);
+                });
+            });
+        }
+
+        function loadChat(chat) {
+            messages = [
+                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, or visual content, respond that you can show them relevant images and then use the searchImages function. Remember: BREVITY SAVES CREDITS! 🐧' },
+                ...chat.messages
+            ];
+            currentChatId = chat.id;
+            
+            const messagesContainer = chatContainer.querySelector('.max-w-3xl');
+            messagesContainer.innerHTML = '';
+            chat.messages.forEach(msg => {
+                displayMessage(msg.content, msg.role, msg.images);
+            });
+            
+            if (window.innerWidth < 768) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        function deleteChat(chatId) {
+            const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
+            const filteredHistory = chatHistory.filter(chat => chat.id !== chatId);
+            localStorage.setItem('pipai-chat-history', JSON.stringify(filteredHistory));
+            loadChatHistory();
+        }
+
+        function getPreviewText() {
+            const userMessages = messages.filter(msg => msg.role === 'user');
+            if (userMessages.length === 0) return 'New conversation';
+            return userMessages[0].content.substring(0, 40) + (userMessages[0].content.length > 40 ? '...' : '');
+        }
+
+        function startNewChat() {
+            messages = [
+                { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, or visual content, respond that you can show them relevant images and then use the searchImages function. Remember: BREVITY SAVES CREDITS! 🐧' }
+            ];
+            currentChatId = Date.now().toString();
+            const messagesContainer = chatContainer.querySelector('.max-w-3xl');
+            messagesContainer.innerHTML = '';
+            
+            displayMessage("Hi! I'm PipAI, ready to help! 🐧 Try asking me to show you images of something!", 'assistant');
+            if (window.innerWidth < 768) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        function clearAllHistory() {
+            if (confirm('Clear all conversations?')) {
+                localStorage.removeItem('pipai-chat-history');
+                loadChatHistory();
+            }
+        }
+
+        // Chat functionality
+        async function sendMessage() {
+            const userInput = messageInput.value.trim();
+            if (!userInput || isLoading) return;
+
+            if (!canSendMessage()) {
+                showRateLimitWarning();
+                return;
+            }
+
+            isLoading = true;
+            recordQuestion();
+
+            displayMessage(userInput, 'user');
+            messages.push({ role: 'user', content: userInput });
+            
+            messageInput.value = '';
+            
+            const loadingMessage = showLoadingIndicator();
+            
+            try {
+                // Check if this is an image request
+                const isRequestingImages = isImageRequest(userInput);
+                let images = [];
+                
+                if (isRequestingImages) {
+                    const imageQuery = extractImageQuery(userInput);
+                    images = await searchImages(imageQuery);
                 }
-            });
 
-            historyList.appendChild(historyItem);
-        });
+                const response = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${perplexityApiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'sonar',
+                        messages: messages,
+                        max_tokens: 150,
+                        temperature: 0.7
+                    })
+                });
 
-        document.querySelectorAll('.delete-chat-btn').forEach((btn) => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteChat(btn.dataset.chatId);
-            });
-        });
-    }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let aiResponse = data.choices[0].message.content;
 
-    function loadChat(chat) {
-        messages = [
-            {
-                role: 'system',
-                content:
-                    "You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, gifs, or visual content, respond that you can show them relevant images and gifs and then use the searchImages or searchGifs functions. Remember: BREVITY SAVES CREDITS! 🐧",
-            },
-            ...chat.messages,
-        ];
-        currentChatId = chat.id;
+                // If we found images, add them to the response
+                if (images.length > 0) {
+                    aiResponse += `\n\nHere are some images I found for you! 🐧`;
+                }
 
-        const messagesContainer = chatContainer.querySelector('.max-w-3xl');
-        messagesContainer.innerHTML = '';
-        chat.messages.forEach((msg) => {
-            displayMessage(msg.content, msg.role, msg.images || [], msg.gifs || []);
-        });
+                const messageData = { role: 'assistant', content: aiResponse };
+                if (images.length > 0) {
+                    messageData.images = images;
+                }
 
-        if (window.innerWidth < 768) {
-            sidebar.classList.remove('open');
-        }
-    }
+                messages.push(messageData);
+                loadingMessage.remove();
+                displayMessage(aiResponse, 'assistant', images);
+                saveChatHistory();
 
-    function deleteChat(chatId) {
-        const chatHistory = JSON.parse(localStorage.getItem('pipai-chat-history') || '[]');
-        const filteredHistory = chatHistory.filter((chat) => chat.id !== chatId);
-        localStorage.setItem('pipai-chat-history', JSON.stringify(filteredHistory));
-        loadChatHistory();
-    }
-
-    function getPreviewText() {
-        const userMessages = messages.filter((msg) => msg.role === 'user');
-        if (userMessages.length === 0) return 'New conversation';
-        return userMessages[0].content.substring(0, 40) + (userMessages[0].content.length > 40 ? '...' : '');
-    }
-
-    function startNewChat() {
-        messages = [
-            {
-                role: 'system',
-                content:
-                    "You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. When users ask for images, pictures, gifs, or visual content, respond that you can show them relevant images and gifs and then use the searchImages or searchGifs functions. Remember: BREVITY SAVES CREDITS! 🐧",
-            },
-        ];
-        currentChatId = Date.now().toString();
-        const messagesContainer = chatContainer.querySelector('.max-w-3xl');
-        messagesContainer.innerHTML = '';
-
-        displayMessage("Hi! I'm PipAI, ready to help! 🐧 Try asking me to show you images or gifs of something!", 'assistant');
-        if (window.innerWidth < 768) {
-            sidebar.classList.remove('open');
-        }
-    }
-
-    async function sendMessage() {
-        const userInput = messageInput.value.trim();
-        if (!userInput || isLoading) return;
-
-        if (!canSendMessage()) {
-            showRateLimitWarning();
-            return;
-        }
-
-        isLoading = true;
-        recordQuestion();
-
-        displayMessage(userInput, 'user');
-        messages.push({ role: 'user', content: userInput });
-
-        messageInput.value = '';
-
-        const loadingMessage = showLoadingIndicator();
-
-        try {
-            const isRequestingImages = isImageRequest(userInput);
-            const isRequestingGifs = isGifRequest(userInput);
-            let images = [];
-            let gifs = [];
-
-            if (isRequestingImages) {
-                const imageQuery = extractImageQuery(userInput);
-                images = await searchImages(imageQuery);
+            } catch (error) {
+                console.error('Error:', error);
+                loadingMessage.remove();
+                displayMessage(`Sorry, I encountered an error: ${error.message}`, 'error');
+            } finally {
+                isLoading = false;
+                updateQuestionCount();
             }
-            if (isRequestingGifs) {
-                const gifQuery = extractGifQuery(userInput);
-                gifs = await searchGifs(gifQuery);
+        }
+
+        function displayMessage(message, role, images = []) {
+            const messagesContainer = chatContainer.querySelector('.max-w-3xl');
+            const messageElement = document.createElement('div');
+            
+            if (role === 'user') {
+                messageElement.className = 'mb-6 flex justify-end';
+                messageElement.innerHTML = `
+                    <div class="user-message max-w-2xl px-4 py-3 rounded-2xl">
+                        <div class="whitespace-pre-wrap">${message}</div>
+                    </div>
+                `;
+            } else if (role === 'assistant') {
+                messageElement.className = 'mb-6';
+                let htmlContent = message
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                
+                const imageGalleryHtml = images && images.length > 0 ? createImageGallery(images, 'search results') : '';
+                
+                messageElement.innerHTML = `
+                    <div class="ai-message py-2">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl mt-1">🐧</span>
+                            <div class="flex-1">
+                                <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${htmlContent}</div>
+                                ${imageGalleryHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (role === 'error') {
+                messageElement.className = 'mb-6';
+                messageElement.innerHTML = `
+                    <div class="ai-message py-2">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl mt-1">⚠️</span>
+                            <div class="flex-1">
+                                <div class="text-red-600 dark:text-red-400 whitespace-pre-wrap">${message}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
 
-            const response = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${perplexityApiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: 'sonar',
-                    messages: messages,
-                    max_tokens: 150,
-                    temperature: 0.7,
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error?.message || `HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            let aiResponse = data.choices[0].message.content;
-
-            if (images.length > 0) aiResponse += '\n\nHere are some images I found for you! 🐧';
-            if (gifs.length > 0) aiResponse += '\n\nHere are some GIFs I found for you! 🐧';
-
-            const messageData = { role: 'assistant', content: aiResponse };
-            if (images.length > 0) messageData.images = images;
-            if (gifs.length > 0) messageData.gifs = gifs;
-
-            messages.push(messageData);
-            loadingMessage.remove();
-            displayMessage(aiResponse, 'assistant', images, gifs);
-            saveChatHistory();
-        } catch (error) {
-            console.error('Error:', error);
-            loadingMessage.remove();
-            displayMessage(`Sorry, I encountered an error: ${error.message}`, 'error');
-        } finally {
-            isLoading = false;
-            updateQuestionCount();
+            messagesContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-    }
 
-    function displayMessage(message, role, images = [], gifs = []) {
-        const messagesContainer = chatContainer.querySelector('.max-w-3xl');
-        const messageElement = document.createElement('div');
-
-        if (role === 'user') {
-            messageElement.className = 'mb-6 flex justify-end';
-            messageElement.innerHTML = `
-                <div class="user-message max-w-2xl px-4 py-3 rounded-2xl">
-                    <div class="whitespace-pre-wrap">${message}</div>
-                </div>
-            `;
-        } else if (role === 'assistant') {
-            messageElement.className = 'mb-6';
-            let htmlContent = message
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
-
-            let imageGalleryHtml = '';
-            if (images.length > 0) imageGalleryHtml = createImageGallery(images, 'search results');
-            let gifGalleryHtml = '';
-            if (gifs.length > 0) gifGalleryHtml = createGifGallery(gifs, 'search results');
-
-            messageElement.innerHTML = `
+        function showLoadingIndicator() {
+            const messagesContainer = chatContainer.querySelector('.max-w-3xl');
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'mb-6';
+            loadingElement.innerHTML = `
                 <div class="ai-message py-2">
                     <div class="flex items-start gap-3">
                         <span class="text-xl mt-1">🐧</span>
                         <div class="flex-1">
-                            <div class="text-gray-900 dark:text-white whitespace-pre-wrap">${htmlContent}</div>
-                            ${imageGalleryHtml}
-                            ${gifGalleryHtml}
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
-        } else if (role === 'error') {
-            messageElement.className = 'mb-6';
-            messageElement.innerHTML = `
-                <div class="ai-message py-2">
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl mt-1">⚠️</span>
-                        <div class="flex-1">
-                            <div class="text-red-600 dark:text-red-400 whitespace-pre-wrap">${message}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            messagesContainer.appendChild(loadingElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return loadingElement;
         }
 
-        messagesContainer.appendChild(messageElement);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function showLoadingIndicator() {
-        const messagesContainer = chatContainer.querySelector('.max-w-3xl');
-        const loadingElement = document.createElement('div');
-        loadingElement.className = 'mb-6';
-        loadingElement.innerHTML = `
-            <div class="ai-message py-2">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl mt-1">🐧</span>
-                    <div class="flex-1">
-                        <div class="typing-indicator">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        messagesContainer.appendChild(loadingElement);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-        return loadingElement;
-    }
-
-    chatForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        sendMessage();
-    });
-
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        // Event listeners
+        chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             sendMessage();
-        }
-    });
+        });
 
-    newChatBtn.addEventListener('click', startNewChat);
-    clearHistoryBtn.addEventListener('click', clearAllHistory);
-    themeToggle.addEventListener('click', toggleTheme);
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-    });
+        newChatBtn.addEventListener('click', startNewChat);
+        clearHistoryBtn.addEventListener('click', clearAllHistory);
+        themeToggle.addEventListener('click', toggleTheme);
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeImageModal();
-        }
-    });
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
 
-    function closeImageModal() {
-        imageModal.classList.add('hidden');
-        modalImage.src = '';
-    }
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
 
-    initTheme();
-    loadChatHistory();
-    startNewChat();
-    updateQuestionCount();
-    setInterval(updateQuestionCount, 5000);
-</script>
+        // Initialize
+        initTheme();
+        loadChatHistory();
+        startNewChat();
+        updateQuestionCount();
+
+        // Update question count every 5 seconds to refresh the UI
+        setInterval(updateQuestionCount, 5000);
+
+    </script>
 </body>
 </html>
-
