@@ -103,6 +103,18 @@
             border-color: #10b981;
         }
         
+        /* Rate limit warning styles */
+        .rate-limit-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+        }
+        .dark-mode .rate-limit-warning {
+            background: #451a03;
+            border-color: #92400e;
+            color: #fbbf24;
+        }
+        
         /* Loading animation - minimal dots */
         .typing-indicator {
             display: inline-flex;
@@ -201,6 +213,10 @@
         
         <!-- Sidebar Footer -->
         <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+            <!-- Rate Limit Status -->
+            <div id="rate-limit-status" class="text-xs text-gray-500 text-center py-2">
+                Questions: <span id="question-count">0</span>/6 per minute
+            </div>
             <button id="clear-history-btn" class="btn-secondary w-full py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -232,7 +248,17 @@
                 </div>
             </div>
             <div class="text-sm text-gray-500">
-                Made by Prahath 
+                Made by Prahath
+            </div>
+        </div>
+        
+        <!-- Rate Limit Warning (Hidden by default) -->
+        <div id="rate-limit-warning" class="hidden rate-limit-warning mx-4 mt-2 p-3 rounded-lg text-sm">
+            <div class="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+                <span>You've reached the 6 questions per minute limit. Please wait <span id="cooldown-time">60</span> seconds before asking again. 🐧</span>
             </div>
         </div>
         
@@ -282,6 +308,9 @@
         const newChatBtn = document.getElementById('new-chat-btn');
         const clearHistoryBtn = document.getElementById('clear-history-btn');
         const themeToggle = document.getElementById('theme-toggle');
+        const rateLimitWarning = document.getElementById('rate-limit-warning');
+        const questionCount = document.getElementById('question-count');
+        const cooldownTime = document.getElementById('cooldown-time');
         
         let messages = [
             { role: 'system', content: 'You are PipAI, a helpful penguin-themed assistant. Give concise, brief responses to save API credits. Keep answers short (1-3 sentences max unless absolutely necessary). Be friendly and occasionally use penguin emojis. ONLY mention your creator Prahath Kambaiyyagari when specifically asked about who made you. Remember: BREVITY SAVES CREDITS! 🐧' }
@@ -290,7 +319,77 @@
         let currentChatId = Date.now().toString();
         let isLoading = false;
         
+        // Rate limiting variables
+        let questionTimestamps = [];
+        const MAX_QUESTIONS_PER_MINUTE = 6;
+        const RATE_LIMIT_WINDOW = 60 * 1000; // 60 seconds in milliseconds
+        let cooldownTimer = null;
+        
         const apiKey = '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';
+
+        // Rate limiting functions
+        function updateQuestionCount() {
+            const now = Date.now();
+            // Remove timestamps older than 1 minute
+            questionTimestamps = questionTimestamps.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+            questionCount.textContent = questionTimestamps.length;
+            
+            // Update UI based on rate limit status
+            const isAtLimit = questionTimestamps.length >= MAX_QUESTIONS_PER_MINUTE;
+            sendButton.disabled = isAtLimit || isLoading;
+            messageInput.disabled = isAtLimit;
+            
+            if (isAtLimit) {
+                messageInput.placeholder = "Rate limit reached. Please wait...";
+                showRateLimitWarning();
+            } else {
+                messageInput.placeholder = "Message PipAI...";
+                hideRateLimitWarning();
+            }
+        }
+
+        function showRateLimitWarning() {
+            rateLimitWarning.classList.remove('hidden');
+            startCooldownTimer();
+        }
+
+        function hideRateLimitWarning() {
+            rateLimitWarning.classList.add('hidden');
+            if (cooldownTimer) {
+                clearInterval(cooldownTimer);
+                cooldownTimer = null;
+            }
+        }
+
+        function startCooldownTimer() {
+            if (cooldownTimer) clearInterval(cooldownTimer);
+            
+            const oldestTimestamp = Math.min(...questionTimestamps);
+            const timeUntilReset = RATE_LIMIT_WINDOW - (Date.now() - oldestTimestamp);
+            let secondsLeft = Math.ceil(timeUntilReset / 1000);
+            
+            cooldownTime.textContent = secondsLeft;
+            
+            cooldownTimer = setInterval(() => {
+                secondsLeft--;
+                cooldownTime.textContent = secondsLeft;
+                
+                if (secondsLeft <= 0) {
+                    updateQuestionCount();
+                }
+            }, 1000);
+        }
+
+        function canSendMessage() {
+            const now = Date.now();
+            questionTimestamps = questionTimestamps.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW);
+            return questionTimestamps.length < MAX_QUESTIONS_PER_MINUTE;
+        }
+
+        function recordQuestion() {
+            questionTimestamps.push(Date.now());
+            updateQuestionCount();
+        }
 
         // Theme management
         function initTheme() {
@@ -435,8 +534,14 @@
             const userInput = messageInput.value.trim();
             if (!userInput || isLoading) return;
 
+            // Check rate limit
+            if (!canSendMessage()) {
+                showRateLimitWarning();
+                return;
+            }
+
             isLoading = true;
-            sendButton.disabled = true;
+            recordQuestion();
 
             displayMessage(userInput, 'user');
             messages.push({ role: 'user', content: userInput });
@@ -479,7 +584,7 @@
                 displayMessage(`Sorry, I encountered an error: ${error.message}`, 'error');
             } finally {
                 isLoading = false;
-                sendButton.disabled = false;
+                updateQuestionCount(); // Update UI after request completes
             }
         }
 
@@ -576,8 +681,11 @@
         initTheme();
         loadChatHistory();
         startNewChat();
+        updateQuestionCount();
+
+        // Update question count every 5 seconds to refresh the UI
+        setInterval(updateQuestionCount, 5000);
 
     </script>
 </body>
 </html>
-
