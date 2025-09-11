@@ -321,8 +321,8 @@
         
         // Rate limiting variables
         let questionTimestamps = [];
-        const MAX_QUESTIONS_PER_MINUTE = 6;
-        const RATE_LIMIT_WINDOW = 60 * 1000; // 60 seconds in milliseconds
+        const MAX_QUESTIONS_PER_MINUTE = 30;
+        const RATE_LIMIT_WINDOW = 1200 * 1000; // 60 seconds in milliseconds
         let cooldownTimer = null;
         
         const apiKey = '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';
